@@ -95,8 +95,8 @@
                             console.error("Ошибка удаления желания: ", error);
                         }
                     };
-
                     li.prepend(deleteButton); // Добавление кнопки слева
+
                     li.appendChild(wishText); // Добавление текста желания
                     wishlistElement.appendChild(li);
                 });
@@ -126,6 +126,12 @@
             color: black;
             display: block;
         }
+        #inputContainer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
         #wishInput {
             width: calc(100% - 22px);
             padding: 12px;
@@ -144,7 +150,6 @@
             cursor: pointer;
             font-size: 16px;
             display: block;
-            margin: 10px auto;
             transition: background-color 0.3s, transform 0.2s;
         }
         #addWish:hover {
@@ -197,8 +202,10 @@
 <body>
     <p class="back-button" onclick="window.location.href='index.html'">В главное меню</p>
     <h1>Виш-лист <span id="userName"></span></h1>
-    <input type="text" id="wishInput" placeholder="Название подарка">
-    <button id="addWish">Добавить</button>
+    <div id="inputContainer">
+        <input type="text" id="wishInput" placeholder="Название подарка">
+        <button id="addWish">Добавить</button>
+    </div>
     <ul id="wishlist"></ul>
 </body>
 </html>
