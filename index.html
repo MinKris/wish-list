@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Выбор виш-листа</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #333;
+        }
+        .user-btn {
+            margin: 20px;
+            padding: 15px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #007BFF;
+            color: white;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .user-btn:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+        .user-btn:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <h1>Выберите виш-лист</h1>
+    <button class="user-btn" onclick="location.href='wish-list.html?user=ksenya'">Виш-лист Ксенюшки</button>
+    <button class="user-btn" onclick="location.href='wish-list.html?user=marisha'">Виш-лист Маришечки</button>
+</body>
+</html>

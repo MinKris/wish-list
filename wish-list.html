@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Виш-лист</title>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+        // Конфигурация Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAqJCBH5j1-2-rWZSGi7wD3s7k5W8t-4ZQ",
+            authDomain: "wish-list-18384.firebaseapp.com",
+            projectId: "wish-list-18384",
+            storageBucket: "wish-list-18384.firebasestorage.app",
+            messagingSenderId: "185787331110",
+            appId: "1:185787331110:web:8defe310ea5b82ea47ece7",
+            measurementId: "G-3NM6NQBPQK"
+        };
+
+        // Инициализация Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let currentUser = '';
+
+        // Получение параметра user из URL
+        const urlParams = new URLSearchParams(window.location.search);
+        currentUser = urlParams.get('user') === 'ksenya' ? 'wishListKsenya' : 'wishListMarisha';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const wishlistElement = document.getElementById('wishlist');
+            const wishInput = document.getElementById('wishInput');
+            const addWishButton = document.getElementById('addWish');
+
+            // Установка имени пользователя
+            const userNameElement = document.getElementById('userName');
+            userNameElement.textContent = currentUser === 'wishListKsenya' ? 'Ксенюшки' : 'Маришечки';
+
+            // Функция для добавления желания
+            addWishButton.onclick = async function() {
+                const wish = wishInput.value;
+                if (wish) {
+                    try {
+                        await addDoc(collection(db, currentUser), { wish: wish });
+                        wishInput.value = '';
+                    } catch (error) {
+                        console.error("Ошибка добавления желания: ", error);
+                    }
+                }
+            };
+
+            // Получение желаний
+            onSnapshot(collection(db, currentUser), snapshot => {
+                wishlistElement.innerHTML = ''; // Очистка списка
+                snapshot.forEach(doc => {
+                    const li = document.createElement('li');
+                    const wishText = document.createElement('span');
+                    wishText.textContent = doc.data().wish;
+                    wishText.className = 'wish-text';
+
+                    // Обработка клика на текст желания для редактирования
+                    wishText.onclick = () => {
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.value = wishText.textContent;
+                        li.replaceChild(input, wishText);
+                        input.focus();
+
+                        // Сохранение изменения
+                        input.onblur = async () => {
+                            const newWish = input.value;
+                            if (newWish) {
+                                try {
+                                    await updateDoc(doc.ref, { wish: newWish });
+                                } catch (error) {
+                                    console.error("Ошибка обновления желания: ", error);
+                                }
+                            }
+                            li.replaceChild(wishText, input);
+                            wishText.textContent = newWish; // Обновляем текст
+                        };
+                    };
+
+                    // Кнопка удаления
+                    const deleteButton = document.createElement('button');
+                    deleteButton.className = 'delete-button';
+                    deleteButton.textContent = '⬜'; // Маленький квадрат
+
+                    deleteButton.onclick = async () => {
+                        try {
+                            await deleteDoc(doc.ref); // Удаление документа
+                        } catch (error) {
+                            console.error("Ошибка удаления желания: ", error);
+                        }
+                    };
+
+                    li.prepend(deleteButton); // Добавление кнопки слева
+                    li.appendChild(wishText); // Добавление текста желания
+                    wishlistElement.appendChild(li);
+                });
+            }, error => {
+                console.error("Ошибка получения желаний: ", error);
+            });
+        });
+    </script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .back-button {
+            margin: 10px 0;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: underline;
+            color: #007BFF;
+            display: block;
+            text-align: center;
+        }
+        #wishInput {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        #addWish {
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            margin: 10px auto;
+        }
+        #addWish:hover {
+            background-color: #218838;
+        }
+        #wishlist {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .delete-button {
+            width: 20px;  
+            height: 20px; 
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-right: 10px;
+            font-size: 18px;
+            line-height: 0;
+        }
+        .delete-button:hover {
+            opacity: 0.7;
+        }
+        .wish-text {
+            cursor: pointer;
+            flex: 1;
+            padding: 5px;
+            transition: background-color 0.3s;
+        }
+        .wish-text:hover {
+            background-color: #e9ecef;
+        }
+    </style>
+</head>
+<body>
+    <p class="back-button" onclick="window.location.href='index.html'">В главное меню</p>
+    <h1>Виш-лист для <span id="userName"></span></h1>
+    <input type="text" id="wishInput" placeholder="Введите ваше желание">
+    <button id="addWish">Добавить</button>
+    <ul id="wishlist"></ul>
+</body>
+</html>
